@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  # Redis Service
+  redis:
+    image: "redislabs/rejson:latest"
+    platform: linux/amd64
+    restart: unless-stopped
+    expose:
+      - "6379"
+    ports:
+      - "6379:6379"
+
+  mock-server:
+    image: mockserver/mockserver:latest
+    platform: linux/amd64
+    ports:
+      - "1090:1090"
+    environment:
+      MOCKSERVER_WATCH_INITIALIZATION_JSON: "true"
+      MOCKSERVER_PROPERTY_FILE: /config/mockserver.properties
+      MOCKSERVER_INITIALIZATION_JSON_PATH: /config/initializerJson.json
+    volumes:
+      - ./config:/config
+
