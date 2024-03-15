@@ -10,12 +10,12 @@
 - [Still To Implement](#still-to-implement)
 
 ## Project Description:
-This golang application accesses JSON data via a public  REST API about routers and their locations, stores the data in 
+This golang application accesses JSON data (via a public REST API) about routers and their locations, stores the data in 
 a redis instance and outputs to stdout a list of connections between their locations.
 
 The public REST API(https://my-json-server.typicode.com/marcuzh/router_location_test_api/db)
-returns JSON data on routers and their locations. Each router record contains the ID of its location and a list of links, which
-represent the IDs of other routers it is connected to. e.g.
+returns JSON data on routers and their locations. Each router record contains the id of its location and a list of links, which
+represent the id's of other routers it is connected to. e.g.
 
 ```json
     {
@@ -38,10 +38,10 @@ Each location record has the id, postcode and name of the location. e.g.
     },
 ```
 
-The links between routers are The links are bidirectional, meaning if router 1 is connected to router 2, then router 2 
+The links between routers are bidirectional, meaning if router 1 is connected to router 2, then router 2 
 is also connected to router 1.
 
-Output should be one line per location, in the format [location name] <-> [location name], e.g.:
+The apps output is 1 location link per line and only prints one direction of the link(as they are bidirectional) in the format [location name] <-> [location name], e.g.:
 
 ```shell
 Adastral <-> London
@@ -49,24 +49,24 @@ London <-> Birmingham
 Birmingham <-> Adastral
 ```
 ## Design Details:
-The code is separated by packages based on mostly single responsibility apart from the `app` package which is the driver 
+The code is separated by packages based mostly on single responsibility/function, apart from the `app` package which is the driver 
 of processing the local flow of the program. 
 
 Our `main` package is our entry point for executing the program. When you build a Go program into an executable binary, 
 it must have a main package, and within that package, there must be a main function. This main function is where the 
-execution of the program begins. package typically handles the setup of dependencies and dependency injection, although 
+execution of the program begins. The main package typically handles the setup of dependencies and dependency injection, although 
 it doesn't follow the conventional patterns of dependency injection seen in other languages like Java or C#.
 In Go, dependencies are typically imported directly within the main package or its subpackages. The init function, 
 if present in the package, can be used to perform initialization tasks, including setting up dependencies.
 
-In our app, we have a dependencies on Storage(Redis), and calling out to A REST API, so we instantiate clients
+In our app, we have a dependencies on Storage(Redis), and calling out to a REST API, so we instantiate clients
 via their respective packages `New` constructor methods to interact with them. Thereafter, we inject them into an instance 
 of the `app` object which has a `process` method which will dictate the flow of execution.
 
 Once in the process function we firstly request the router location data via the api client and function call
 `GetRouterLocationData`. The api package contains an `API` interface which the client is an instantiation of. This is an
-example of the OO principal abstract as we define a set of methods in the interface that a type(client in this instance)
-must implement. The interesting thing about the API. The beauty of Go is that while we use OO prinpals, we can also leverage
+example of the OO principal abstraction, as we define a set of methods in the interface that a type(client in this instance)
+must implement. The beauty of Go is that while we use OO principals, we can also leverage
 some benefits or functional programing as functions are first-class citizens. If you look the `ClientOptions` function
 in the api package and the `options.go` file, you will see that we use functional options as a way to provide flexible and 
 extensible configuration to Go structs. They allow users to customize the behavior of a struct by passing functional options 
@@ -193,7 +193,7 @@ A script per os environment has been provided, either `start_linux.sh` or `start
 e.g.
 
 ```shell
- sh start_macos.sh.sh
+ sh start_macos.sh
 ```
 
 This runs a command from the Makefile to build an executable depending on the OS. It then spins up redis as one
